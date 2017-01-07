@@ -1,9 +1,8 @@
 {
-  "name": "nodechat",
+  "name": "headchat",
   "author": "Justin Chadwell",
   "license": "MIT",
   "version": "0.0.0",
-  "private": true,
   "scripts": {
     "start": "node ./bin/www --use-strict",
     "test": "standard **/*.js **/*.vue bin/www --verbose --fix"
