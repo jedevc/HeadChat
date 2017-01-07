@@ -1,12 +1,12 @@
 <template>
-<div class="chat">
-  <button @click="newChat">new</button>
-  <message-list class="messages" :messages="messages"></message-list>
-  <message-input class="input" @send="send"></message-input>
+<div class='chat'>
+  <button @click='newChat'>new</button>
+  <message-list class='messages' :messages='messages'></message-list>
+  <message-input class='input' @send='send'></message-input>
 </div>
 </template>
 
-<style lang="less" scoped>
+<style lang='less' scoped>
 .chat {
   display: flex;
   flex-flow: column;
@@ -30,9 +30,9 @@ export default {
     }
   },
   methods: {
-    newChat: function() {
+    newChat: function () {
       this.messages.length = 0
-      this.messages.push({author: 'autobot', content: "Waiting for new user..."})
+      this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
       this.socket.emit('new')
     },
     send: function (msg) {
@@ -43,7 +43,7 @@ export default {
     }
   },
   created: function () {
-    this.messages.push({author: 'autobot', content: "Waiting for new user..."})
+    this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
 
     this.socket.on('connect', () => {
       this.socket.emit('new')
