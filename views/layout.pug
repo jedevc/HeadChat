@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    block head
+      title Node chat
+
+      link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Fredoka+One|Muli:400,600')
+      link(rel='stylesheet' href='/stylesheets/main.css')
+  body
+    div.header
+      a(href='/')
+        img(src='/images/logo.svg' alt='logo')
+      h1 Node chat
+
+      div.links
+        a(href='/about')
+          h2 About
+        a(href='/chat')
+          h2 Chat
+    div.main
+      block body
