@@ -13,37 +13,40 @@ function getRequest () {
   }
 }
 
-function initialize (socket) {
-  socket.on('disconnect', () => {
-    requests.delete(socket.room)
-    socket.to(socket.room).emit('left')
-    socket.room = null
-  })
-  socket.on('new', () => {
-    if (socket.room) {
-      socket.to(socket.room).emit('left')
-      socket.leave(socket.room)
-      requests.delete(socket.room)
-    }
+function newEvent (socket) {
+  if (socket.room) {
+    disconnectEvent(socket)
+  }
 
-    var req = getRequest()
-    if (req) {
-      socket.room = req
-      socket.join(req)
-      socket.emit('join')
-      socket.to(socket.room).emit('join')
-    } else {
-      var room = uuid()
-      socket.room = room
-      socket.join(room)
-      requests.add(room)
-    }
-  })
-  socket.on('message-send', (msg) => {
-    if (socket.room && msg.length > 0) {
-      socket.to(socket.room).emit('message-receive', msg)
-    }
-  })
+  var req = getRequest()
+  if (req) {
+    socket.room = req
+    socket.join(req)
+    socket.emit('join')
+    socket.to(socket.room).emit('join')
+  } else {
+    var room = uuid()
+    socket.room = room
+    socket.join(room)
+    requests.add(room)
+  }
 }
 
-module.exports.io = initialize
+function messageSendEvent (socket, msg) {
+  if (socket.room && msg.length > 0) {
+    socket.to(socket.room).emit('message-receive', msg)
+  }
+}
+
+function disconnectEvent (socket) {
+  requests.delete(socket.room)
+  socket.to(socket.room).emit('left')
+  socket.leave(socket.room)
+  socket.room = null
+}
+
+module.exports.io = (socket) => {
+  socket.on('disconnect', () => {disconnectEvent(socket)})
+  socket.on('new', () => {newEvent(socket)})
+  socket.on('message-send', (msg) => {messageSendEvent(socket, msg)})
+}
