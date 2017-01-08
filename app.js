@@ -11,11 +11,6 @@ var less = require('less-middleware')
 var browserify = require('browserify-middleware')
 var babelify = require('babelify')
 var vueify = require('vueify')
-browserify.settings({
-  transform: [babelify.configure({
-    presets: ['env']
-  }), vueify]
-})
 
 var routes = require('./config/routes.js')
 
@@ -33,10 +28,30 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
-// setup public files
-// TODO: find better cache locations
-app.use('/stylesheets', less(path.join(__dirname, 'public', 'stylesheets')))
+// setup less stylesheets
+var lessOptions = {}
+if (app.get('env') === 'production') {
+  lessOptions = {
+    debug: false,
+    once: true
+  }
+} else {
+  lessOptions = {
+    debug: true,
+    once: false,
+  }
+}
+app.use('/stylesheets', less(path.join(__dirname, 'public', 'stylesheets'), lessOptions))
+
+// setup browserify
+browserify.settings({
+  transform: [babelify.configure({
+    presets: ['env']
+  }), vueify]
+})
 app.use('/javascripts', browserify(path.join(__dirname, 'public', 'javascripts')))
+
+// serve static files
 app.use(express.static(path.join(__dirname, 'public')))
 
 // setup routes
