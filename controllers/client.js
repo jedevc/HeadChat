@@ -1,42 +1,42 @@
 var uuid = require('uuid/v1')
 
-var lobby = {}
+var requests = new Set()
+
+function getRequest () {
+  var reqs = Array.from(requests.values())
+  if (reqs.length > 0) {
+    var req = reqs[Math.floor(Math.random() * reqs.length)]
+    requests.delete(req)
+    return req
+  } else {
+    return null;
+  }
+}
 
 function initialize (socket) {
   socket.on('disconnect', () => {
-    if (socket.id in lobby) {
-      delete lobby[socket.id]
-    }
-
-    if (socket.room) {
-      socket.to(socket.room).emit('left')
-    }
+    requests.delete(socket.room)
+    socket.to(socket.room).emit('left')
+    socket.room = null
   })
   socket.on('new', () => {
     if (socket.room) {
       socket.to(socket.room).emit('left')
       socket.leave(socket.room)
-      socket.room = null
+      requests.delete(socket.room)
     }
 
-    if (!(socket.id in lobby)) {
-      var sockets = Object.keys(lobby)
-      if (sockets.length > 0) {
-        var key = sockets[Math.floor(Math.random() * sockets.length)]
-
-        var other = lobby[key]
-        delete lobby[key]
-
-        var room = uuid()
-        socket.room = room
-        socket.join(room)
-        socket.emit('ready')
-        other.room = room
-        other.join(room)
-        other.emit('ready')
-      } else {
-        lobby[socket.id] = socket
-      }
+    var req = getRequest()
+    if (req) {
+      socket.room = req
+      socket.join(req)
+      socket.emit('join')
+      socket.to(socket.room).emit('join')
+    } else {
+      var room = uuid()
+      socket.room = room
+      socket.join(room)
+      requests.add(room)
     }
   })
   socket.on('message-send', (msg) => {

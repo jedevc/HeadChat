@@ -1,8 +1,10 @@
 <template>
 <div class='chat'>
-  <button @click='newChat'>new</button>
+  <div>
+    <button @click='newEvent'>new</button>
+  </div>
   <message-list class='messages' :messages='messages'></message-list>
-  <message-input class='input' @send='send'></message-input>
+  <message-input class='input' @send='sendEvent'></message-input>
 </div>
 </template>
 
@@ -30,12 +32,12 @@ export default {
     }
   },
   methods: {
-    newChat: function () {
+    newEvent: function () {
       this.messages.length = 0
       this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
       this.socket.emit('new')
     },
-    send: function (msg) {
+    sendEvent: function (msg) {
       if (msg.length > 0) {
         this.messages.push({author: 'me', content: msg})
         this.socket.emit('message-send', msg)
@@ -53,7 +55,7 @@ export default {
       this.messages.push({author: 'other', content: msg})
     })
 
-    this.socket.on('ready', () => {
+    this.socket.on('join', () => {
       this.messages.push({author: 'autobot', content: 'You are connected.'})
     })
 
