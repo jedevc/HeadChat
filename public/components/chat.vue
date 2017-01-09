@@ -1,5 +1,6 @@
 <template>
 <div class='chat'>
+  <input type='text' @blur='nickChangeEvent' :value='nick'></input>
   <div>
     <button @click='newEvent'>new</button>
   </div>
@@ -27,6 +28,7 @@ var io = require('socket.io-client')
 export default {
   data: function () {
     return {
+      nick: 'anon',
       socket: io.connect('http://localhost:3000/client'),
       messages: []
     }
@@ -35,12 +37,20 @@ export default {
     newEvent: function () {
       this.messages.length = 0
       this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
-      this.socket.emit('new')
+      this.socket.emit('new', this.nick)
     },
     sendEvent: function (msg) {
       if (msg.length > 0) {
-        this.messages.push({author: 'me', content: msg})
+        this.messages.push({author: this.nick, content: msg})
         this.socket.emit('message-send', msg)
+      }
+    },
+    nickChangeEvent: function (event) {
+      if (event.target.value.length == 0) {
+        event.target.value = this.nick
+      } else {
+        this.nick = event.target.value
+        this.socket.emit('nick', this.nick)
       }
     }
   },
@@ -48,11 +58,11 @@ export default {
     this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
 
     this.socket.on('connect', () => {
-      this.socket.emit('new')
+      this.socket.emit('new', this.nick)
     })
 
-    this.socket.on('message-receive', (msg) => {
-      this.messages.push({author: 'other', content: msg})
+    this.socket.on('message-receive', (sender, msg) => {
+      this.messages.push({author: sender, content: msg})
     })
 
     this.socket.on('join', () => {

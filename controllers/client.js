@@ -13,10 +13,12 @@ function getRequest () {
   }
 }
 
-function newEvent (socket) {
+function newEvent (socket, nick) {
   if (socket.room) {
     disconnectEvent(socket)
   }
+
+  socket.nick = nick
 
   var req = getRequest()
   if (req) {
@@ -32,9 +34,15 @@ function newEvent (socket) {
   }
 }
 
+function nickEvent (socket, nick) {
+  if (socket.room && nick.length > 0) {
+    socket.nick = nick
+  }
+}
+
 function messageSendEvent (socket, msg) {
   if (socket.room && msg.length > 0) {
-    socket.to(socket.room).emit('message-receive', msg)
+    socket.to(socket.room).emit('message-receive', socket.nick, msg)
   }
 }
 
@@ -47,6 +55,7 @@ function disconnectEvent (socket) {
 
 module.exports.io = (socket) => {
   socket.on('disconnect', () => {disconnectEvent(socket)})
-  socket.on('new', () => {newEvent(socket)})
+  socket.on('new', (nick) => {newEvent(socket, nick)})
+  socket.on('nick', (nick) => {nickEvent(socket, nick)})
   socket.on('message-send', (msg) => {messageSendEvent(socket, msg)})
 }
