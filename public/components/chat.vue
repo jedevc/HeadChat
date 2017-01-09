@@ -37,12 +37,12 @@ export default {
     newEvent: function () {
       this.messages.length = 0
       this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
-      this.socket.emit('new', this.nick)
+      this.socket.emit('new', this.nick, console.error)
     },
     sendEvent: function (msg) {
       if (msg.length > 0) {
         this.messages.push({author: this.nick, content: msg})
-        this.socket.emit('message-send', msg)
+        this.socket.emit('message-send', msg, console.error)
       }
     },
     nickChangeEvent: function (event) {
@@ -50,7 +50,7 @@ export default {
         event.target.value = this.nick
       } else {
         this.nick = event.target.value
-        this.socket.emit('nick', this.nick)
+        this.socket.emit('nick', this.nick, console.error)
       }
     }
   },
@@ -58,7 +58,7 @@ export default {
     this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
 
     this.socket.on('connect', () => {
-      this.socket.emit('new', this.nick)
+      this.socket.emit('new', this.nick, console.error)
     })
 
     this.socket.on('message-receive', (sender, msg) => {

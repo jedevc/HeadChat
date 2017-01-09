@@ -13,12 +13,17 @@ function getRequest () {
   }
 }
 
-function newEvent (socket, nick) {
+function newEvent (socket, nick, err) {
   if (socket.room) {
     disconnectEvent(socket)
   }
 
-  socket.nick = nick
+  if (nick && nick.length > 0) {
+    socket.nick = nick
+  } else {
+    if (err) err('Invalid nick.')
+    return
+  }
 
   var req = getRequest()
   if (req) {
@@ -34,19 +39,27 @@ function newEvent (socket, nick) {
   }
 }
 
-function nickEvent (socket, nick) {
-  if (socket.room && nick.length > 0) {
+function nickEvent (socket, nick, err) {
+  if (!socket.room) {
+    if (err) err('Not connected to chat.')
+  } else if (nick && nick.length == 0) {
+    if (err) err('Invalid nick.')
+  } else {
     socket.nick = nick
   }
 }
 
-function messageSendEvent (socket, msg) {
-  if (socket.room && msg.length > 0) {
+function messageSendEvent (socket, msg, err) {
+  if (!socket.room) {
+    if (err) err('Not connected to chat.')
+  } else if (msg && msg.length == 0) {
+    if (err) err('Invalid message.')
+  } else {
     socket.to(socket.room).emit('message-receive', socket.nick, msg)
   }
 }
 
-function disconnectEvent (socket) {
+function disconnectEvent (socket, err) {
   requests.delete(socket.room)
   socket.to(socket.room).emit('left')
   socket.leave(socket.room)
@@ -54,8 +67,8 @@ function disconnectEvent (socket) {
 }
 
 module.exports.io = (socket) => {
-  socket.on('disconnect', () => {disconnectEvent(socket)})
-  socket.on('new', (nick) => {newEvent(socket, nick)})
-  socket.on('nick', (nick) => {nickEvent(socket, nick)})
-  socket.on('message-send', (msg) => {messageSendEvent(socket, msg)})
+  socket.on('disconnect', (...args) => {disconnectEvent(socket, ...args)})
+  socket.on('new', (...args) => {newEvent(socket, ...args)})
+  socket.on('nick', (...args) => {nickEvent(socket, ...args)})
+  socket.on('message-send', (...args) => {messageSendEvent(socket, ...args)})
 }
