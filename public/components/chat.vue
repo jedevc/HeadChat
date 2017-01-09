@@ -3,6 +3,7 @@
   <input type='text' @blur='nickChangeEvent' :value='nick'></input>
   <div>
     <button @click='newEvent'>new</button>
+    <button @click='inviteEvent'>invite</button>
   </div>
   <message-list class='messages' :messages='messages'></message-list>
   <message-input class='input' @send='sendEvent'></message-input>
@@ -38,6 +39,9 @@ export default {
       this.messages.length = 0
       this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
       this.socket.emit('new', this.nick, console.error)
+    },
+    inviteEvent: function () {
+      this.socket.emit('invite', console.error)
     },
     sendEvent: function (msg) {
       if (msg.length > 0) {

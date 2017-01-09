@@ -39,6 +39,16 @@ function newEvent (socket, nick, err) {
   }
 }
 
+function inviteEvent (socket, err) {
+  if (!socket.room) {
+    if (err) err('Not connected to chat.')
+  } else if (requests.has(socket.room)) {
+    if (err) err('Already waiting on request.')
+  } else {
+    requests.add(socket.room)
+  }
+}
+
 function nickEvent (socket, nick, err) {
   if (!socket.room) {
     if (err) err('Not connected to chat.')
@@ -60,7 +70,7 @@ function messageSendEvent (socket, msg, err) {
 }
 
 function disconnectEvent (socket, err) {
-  requests.delete(socket.room)
+  requests.delete(socket.room)  // FIXME: should not cancel request if have others
   socket.to(socket.room).emit('left')
   socket.leave(socket.room)
   socket.room = null
@@ -69,6 +79,7 @@ function disconnectEvent (socket, err) {
 module.exports.io = (socket) => {
   socket.on('disconnect', (...args) => {disconnectEvent(socket, ...args)})
   socket.on('new', (...args) => {newEvent(socket, ...args)})
+  socket.on('invite', (...args) => {inviteEvent(socket, ...args)})
   socket.on('nick', (...args) => {nickEvent(socket, ...args)})
   socket.on('message-send', (...args) => {messageSendEvent(socket, ...args)})
 }
