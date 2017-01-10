@@ -1,6 +1,7 @@
 var uuid = require('uuid/v1')
 
 var requests = new Set()
+var rooms = {}
 
 function getRequest () {
   var reqs = Array.from(requests.values())
@@ -29,12 +30,18 @@ function newEvent (socket, nick, err) {
   if (req) {
     socket.room = req
     socket.join(req)
+
+    rooms[socket.room] += 1
+
     socket.emit('join')
     socket.to(socket.room).emit('join')
   } else {
     var room = uuid()
     socket.room = room
     socket.join(room)
+
+    rooms[room] = 1
+
     requests.add(room)
   }
 }
@@ -70,7 +77,11 @@ function messageSendEvent (socket, msg, err) {
 }
 
 function disconnectEvent (socket, err) {
-  requests.delete(socket.room)  // FIXME: should not cancel request if have others
+  rooms[socket.room] -= 1
+  if (rooms[socket.room] <= 1) {
+    delete rooms[socket.room]
+    requests.delete(socket.room)
+  }
   socket.to(socket.room).emit('left')
   socket.leave(socket.room)
   socket.room = null
