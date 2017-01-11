@@ -34,7 +34,7 @@ function newEvent (socket, nick, err) {
     rooms[socket.room] += 1
 
     socket.emit('join')
-    socket.to(socket.room).emit('join')
+    socket.to(socket.room).emit('join', socket.nick)
   } else {
     var room = uuid()
     socket.room = room
@@ -76,13 +76,16 @@ function messageSendEvent (socket, msg, err) {
   }
 }
 
-function disconnectEvent (socket, err) {
+function disconnectEvent (socket) {
+  socket.to(socket.room).emit('left', socket.nick)
+
   rooms[socket.room] -= 1
   if (rooms[socket.room] <= 1) {
     delete rooms[socket.room]
     requests.delete(socket.room)
+    socket.to(socket.room).emit('end')
   }
-  socket.to(socket.room).emit('left')
+
   socket.leave(socket.room)
   socket.room = null
 }

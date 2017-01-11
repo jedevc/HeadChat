@@ -59,7 +59,7 @@ export default {
     }
   },
   created: function () {
-    this.messages.push({author: 'autobot', content: 'Waiting for new user...'})
+    this.messages.push({author: 'autobot', content: 'Waiting for someone...'})
 
     this.socket.on('connect', () => {
       this.socket.emit('new', this.nick, console.error)
@@ -69,12 +69,20 @@ export default {
       this.messages.push({author: sender, content: msg})
     })
 
-    this.socket.on('join', () => {
-      this.messages.push({author: 'autobot', content: 'You are connected.'})
+    this.socket.on('join', (nick) => {
+      if (nick) {
+        this.messages.push({author: 'autobot', content: `${nick} joined.`})
+      } else {
+        this.messages.push({author: 'autobot', content: 'You\'ve joined.'})
+      }
     })
 
-    this.socket.on('left', () => {
-      this.messages.push({author: 'autobot', content: 'You are now disconnected.'})
+    this.socket.on('left', (nick) => {
+      this.messages.push({author: 'autobot', content: `${nick} left.`})
+    })
+
+    this.socket.on('end', () => {
+      this.messages.push({author: 'autobot', content: 'Everyone is gone... how about a new chat?'})
     })
   },
   components: {
