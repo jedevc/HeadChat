@@ -6,7 +6,7 @@
     <button @click='inviteEvent'>invite</button>
   </div>
   <message-list class='messages' :messages='messages'></message-list>
-  <message-input class='input' @send='sendEvent'></message-input>
+  <message-box @send='sendEvent'></entrybox>
 </div>
 </template>
 
@@ -87,7 +87,7 @@ export default {
   },
   components: {
     'message-list': require('./message_list.vue'),
-    'message-input': require('./entrybox.vue')
+    'message-box': require('./message_box.vue')
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
 <form class="chat-form" @submit="send">
-  <input type="text" v-model="input">
+  <input type="text" v-model="message">
   <input type="image" src="/images/send.svg">
 </form>
 </template>
@@ -34,15 +34,15 @@
 export default {
   data: function () {
     return {
-      input: ''
+      message: ''
     }
   },
   methods: {
     send: function (event) {
       event.preventDefault()
 
-      this.$emit('send', this.input)
-      this.input = ''
+      this.$emit('send', this.message)
+      this.message = ''
     }
   }
 }
