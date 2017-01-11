@@ -2,4 +2,7 @@ extends layout.pug
 block body
   h1 HeadChat
 
-  a(href='/chat') Chat now!
+  form(action='/chat' method='get')
+    input(type='text' name='nick' placeholder='nick')
+    br
+    input(type='submit' value='Chat now!')

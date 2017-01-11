@@ -1,6 +1,7 @@
 extends layout.pug
 
 block append head
+  script window.usernick = '#{nick}'
   script(src='/javascripts/chat.js' charset='utf-8')
 
 block body

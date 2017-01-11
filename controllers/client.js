@@ -56,16 +56,6 @@ function inviteEvent (socket, err) {
   }
 }
 
-function nickEvent (socket, nick, err) {
-  if (!socket.room) {
-    if (err) err('Not connected to chat.')
-  } else if (nick && nick.length == 0) {
-    if (err) err('Invalid nick.')
-  } else {
-    socket.nick = nick
-  }
-}
-
 function messageSendEvent (socket, msg, err) {
   if (!socket.room) {
     if (err) err('Not connected to chat.')
@@ -94,6 +84,5 @@ module.exports.io = (socket) => {
   socket.on('disconnect', (...args) => {disconnectEvent(socket, ...args)})
   socket.on('new', (...args) => {newEvent(socket, ...args)})
   socket.on('invite', (...args) => {inviteEvent(socket, ...args)})
-  socket.on('nick', (...args) => {nickEvent(socket, ...args)})
   socket.on('message-send', (...args) => {messageSendEvent(socket, ...args)})
 }
