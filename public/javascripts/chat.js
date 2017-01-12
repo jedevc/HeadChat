@@ -1,4 +1,4 @@
-var Vue = require('vue/dist/vue.js')
+var Vue = require('vue')
 
 var $ = require('jquery')
 

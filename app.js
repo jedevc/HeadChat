@@ -45,6 +45,7 @@ app.use('/stylesheets', less(path.join(__dirname, 'public', 'stylesheets'), less
 
 // setup browserify
 browserify.settings({
+  noParse: ['jquery'],
   transform: [babelify.configure({
     presets: ['env']
   }), vueify]

@@ -10,7 +10,7 @@ function getRequest () {
     requests.delete(req)
     return req
   } else {
-    return null;
+    return null
   }
 }
 
@@ -59,7 +59,7 @@ function inviteEvent (socket, err) {
 function messageSendEvent (socket, msg, err) {
   if (!socket.room) {
     if (err) err('Not connected to chat.')
-  } else if (msg && msg.length == 0) {
+  } else if (msg && msg.length === 0) {
     if (err) err('Invalid message.')
   } else {
     socket.to(socket.room).emit('message-receive', socket.nick, msg)
@@ -81,8 +81,8 @@ function disconnectEvent (socket) {
 }
 
 module.exports.io = (socket) => {
-  socket.on('disconnect', (...args) => {disconnectEvent(socket, ...args)})
-  socket.on('new', (...args) => {newEvent(socket, ...args)})
-  socket.on('invite', (...args) => {inviteEvent(socket, ...args)})
-  socket.on('message-send', (...args) => {messageSendEvent(socket, ...args)})
+  socket.on('disconnect', (...args) => { disconnectEvent(socket, ...args) })
+  socket.on('new', (...args) => { newEvent(socket, ...args) })
+  socket.on('invite', (...args) => { inviteEvent(socket, ...args) })
+  socket.on('message-send', (...args) => { messageSendEvent(socket, ...args) })
 }

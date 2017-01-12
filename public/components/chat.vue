@@ -46,7 +46,7 @@ export default {
         this.messages.push({author: window.usernick, content: msg})
         this.socket.emit('message-send', msg, console.error)
       }
-    },
+    }
   },
   created: function () {
     this.messages.push({author: 'autobot', content: 'Waiting for someone...'})
